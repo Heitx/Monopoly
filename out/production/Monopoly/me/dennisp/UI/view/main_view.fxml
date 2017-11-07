@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.dennisp.UI.controller.MainController">
+   <top>
+    <MenuBar BorderPane.alignment="CENTER">
+      <menus>
+        <Menu mnemonicParsing="false" text="File">
+          <items>
+            <MenuItem mnemonicParsing="false" text="New" />
+            <MenuItem mnemonicParsing="false" text="Open…" />
+            <Menu mnemonicParsing="false" text="Open Recent" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Close" />
+            <MenuItem mnemonicParsing="false" text="Save" />
+            <MenuItem mnemonicParsing="false" text="Save As…" />
+            <MenuItem mnemonicParsing="false" text="Revert" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Preferences…" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Quit" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+   </top>
+   <bottom>
+      <AnchorPane BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+         <children>
+            <VBox alignment="CENTER" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <HBox alignment="CENTER" spacing="5.0">
+                     <children>
+                        <Button fx:id="btnThrow" mnemonicParsing="false" onAction="#ButtonThrow_Click" prefWidth="100.0" text="Throw" />
+                        <Button fx:id="btnBuy" mnemonicParsing="false" onAction="#ButtonBuy_Click" prefWidth="100.0" text="Buy" />
+                      <Button fx:id="btnSell" mnemonicParsing="false" onAction="#ButtonSell_Click" prefWidth="100.0" text="Sell" />
+                        <Button fx:id="btnEndTurn" mnemonicParsing="false" onAction="#ButtonEndTurn_Click" prefWidth="100.0" text="End Turn" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </bottom>
+   <right>
+      <ScrollPane hbarPolicy="NEVER" prefWidth="150.0" BorderPane.alignment="CENTER">
+         <content>
+            <AnchorPane>
+               <children>
+                  <VBox fx:id="vboxPlayer" AnchorPane.bottomAnchor="178.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <TextArea editable="false" promptText="Console..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </ScrollPane>
+   </right>
+   <center>
+      <AnchorPane BorderPane.alignment="CENTER">
+         <children>
+            <Pane fx:id="gridBoard" prefHeight="535.0" prefWidth="650.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>
