@@ -1,15 +1,11 @@
 package me.dennisp.UI.controller;
 
-import javafx.beans.binding.IntegerBinding;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import me.dennisp.BLL.Domain;
@@ -55,7 +51,7 @@ public class MainController implements Initializable {
 
 	@FXML
 	void ButtonThrow_Click(ActionEvent event) {
-		initializeBoard();
+
 	}
 
 	@FXML
@@ -194,44 +190,27 @@ public class MainController implements Initializable {
 	}
 
 	private void initializePlayers() {
-		int amount = getAmountOfPlayers();
-
-		for(int i = 0; i < amount; i++) {
-			domain.addPlayer(getPlayerName(i + 1));
-		}
-
+		getPlayerNames();
 		addPlayers();
 	}
 
-	private int getAmountOfPlayers() {
-		int amount = 0;
-		Dialog dialogAmount = new TextInputDialog("2");
-		dialogAmount.setTitle("Monopoly - Player Creation");
-		dialogAmount.setHeaderText("How many players are going to play (min. 2)?");
-		dialogAmount.setContentText("Players:");
+	private void getPlayerNames() {
+		Dialog dialog = new TextInputDialog("Dennis, Bjarke");
+		dialog.setTitle("Monpoly | Player Creation");
+		dialog.setHeaderText("Seperate each player name by a comma.");
+		dialog.setContentText("Names:");
+
+		String[] names;
 
 		do {
-			Optional o = dialogAmount.showAndWait();
+			Optional o = dialog.showAndWait();
 
-			try {
-				amount = o.isPresent() ? Integer.parseInt((String) o.get()) : 0;
-			} catch(NumberFormatException ex) {
-				// runs when the input format is not a number
-			}
-		} while(amount < 2);
+			names = o.isPresent() ? ((String) o.get()).split(",") : null;
+		} while(names == null || names.length < 2);
 
-		return amount;
-	}
-
-	private String getPlayerName(int playerIndex) {
-		Dialog dialogAmount = new TextInputDialog();
-		dialogAmount.setTitle("Monopoly - Player Creation");
-		dialogAmount.setHeaderText(String.format("Please enter the name of player #%d", playerIndex));
-		dialogAmount.setContentText(String.format("Player #%d:", playerIndex));
-
-		Optional o = dialogAmount.showAndWait();
-
-		return o.isPresent() ? (String) o.get() : "Nameless";
+		for(String name : names) {
+			domain.addPlayer(name);
+		}
 	}
 
 	private void addPlayers() {
