@@ -1,5 +1,7 @@
 package me.dennisp.UI.controller;
 
+import javafx.beans.binding.IntegerBinding;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.*;
@@ -29,10 +31,11 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 	private HashMap<Player, PlayerLayoutController> playerController;
+	private HashMap<Point2D, StackPane> cells;
 	private Domain domain;
 
 	@FXML private VBox vboxPlayer;
-	@FXML private Pane gridBoard;
+	@FXML private GridPane gridBoard;
 	@FXML private Button btnThrow;
 	@FXML private Button btnBuy;
 	@FXML private Button btnSell;
@@ -41,6 +44,7 @@ public class MainController implements Initializable {
 	public MainController() {
 		this.domain = new Driver();
 		this.playerController = new HashMap<>();
+		this.cells = new HashMap<>();
 	}
 
 	@Override
@@ -71,38 +75,45 @@ public class MainController implements Initializable {
 
 	private void initializeBoard() {
 		assignGridPositionToFields();
+		addColmnsAndRowsToGrid();
 		addShapeToFields();
 		drawBoard();
 	}
 
 	private void drawBoard() {
-		FieldTemplate[] fields = domain.getFields();
+		Point2D point;
 
-		gridBoard.getChildren().clear();
+		for(FieldTemplate field : domain.getFields()) {
+			point = field.getGridPosition();
 
-		for(FieldTemplate field : fields) {
-			Rectangle shape = (Rectangle) field.getShape();
+			if(point != null) {
+				StackPane pane = new StackPane();
 
-			if(field instanceof OwnableField) {
-				shape.setFill(Color.GREEN);
-			} else if(field instanceof OtherField) {
-				shape.setFill(Color.DARKSEAGREEN);
-			} else {
-				shape.setFill(Color.DIMGREY);
+				Rectangle rectangle = new Rectangle();
+
+				rectangle.widthProperty().bind(pane.widthProperty());
+				rectangle.heightProperty().bind(pane.heightProperty());
+
+				if(field instanceof OwnableField) {
+					rectangle.setFill(Color.GREEN);
+				} else if(field instanceof OtherField) {
+					rectangle.setFill(Color.DARKSEAGREEN);
+				} else {
+					rectangle.setFill(Color.DIMGREY);
+				}
+
+				Label label = new Label(field.getPosition() + "\n" + field.getName());
+				label.setPadding(new Insets(1));
+				label.setFont(Font.font(12));
+				label.setTextAlignment(TextAlignment.CENTER);
+				label.setContentDisplay(ContentDisplay.CENTER);
+
+				pane.getChildren().add(rectangle);
+				pane.getChildren().add(label);
+
+				cells.put(point, pane);
+				gridBoard.add(pane, (int) point.getX(), (int) point.getY());
 			}
-
-			Label label = new Label(field.getPosition() + System.lineSeparator() + field.getName());
-			label.setLayoutX(shape.getX());
-			label.setLayoutY(shape.getY());
-			label.setPrefWidth(shape.getWidth());
-			label.setPrefHeight(shape.getHeight());
-			label.setPadding(new Insets(2));
-			label.setTextAlignment(TextAlignment.CENTER);
-			label.setContentDisplay(ContentDisplay.CENTER);
-			label.setAlignment(Pos.CENTER);
-
-			gridBoard.getChildren().add(shape);
-			gridBoard.getChildren().add(label);
 		}
 	}
 
@@ -122,9 +133,38 @@ public class MainController implements Initializable {
 			Point2D point = field.getGridPosition();
 
 			Rectangle shape = new Rectangle(point.getX() * width, point.getY() * height, width, height);
-			shape.xProperty().bind();
-
 			field.setShape(shape);
+		}
+	}
+
+	private void addColmnsAndRowsToGrid() {
+		FieldTemplate[] fields = domain.getFields();
+
+		// formula:
+		// O = C * 2 + R * 2 + 4
+
+		int columns = (int) Math.ceil(fields.length / 4.0);
+		int rows = (int) Math.floor(fields.length / 4.0 + 2);
+
+		final double widthPct = gridBoard.getPrefWidth() / (gridBoard.getPrefWidth() / columns);
+		final double heightPct = gridBoard.getPrefHeight() / (gridBoard.getPrefHeight() / rows);
+
+		// adds the columns and rows
+
+		for(int i = 0; i < columns; i++) {
+			ColumnConstraints col = new ColumnConstraints();
+			col.setPercentWidth(widthPct);
+			col.setHalignment(HPos.CENTER);
+
+			gridBoard.getColumnConstraints().add(col);
+		}
+
+		for(int i = 0; i < rows; i++) {
+			RowConstraints row = new RowConstraints();
+			row.setPercentHeight(heightPct);
+			row.setValignment(VPos.CENTER);
+
+			gridBoard.getRowConstraints().add(row);
 		}
 	}
 
