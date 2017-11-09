@@ -19,28 +19,20 @@ public class PlayerLayoutController {
 	@FXML private Label labelWorth;
 	@FXML private ListView<OwnableField> listviewBuilding;
 
-	public String getLabelName() {
-		return labelName.getText();
-	}
-
 	public void setLabelName(String labelName) {
 		this.labelName.setText(labelName);
-	}
-
-	public String getLabelMoney() {
-		return labelMoney.getText();
 	}
 
 	public void setLabelMoney(String labelMoney) {
 		this.labelMoney.setText(labelMoney);
 	}
 
-	public String getLabelWorth() {
-		return labelWorth.getText();
-	}
-
 	public void setLabelWorth(String labelWorth) {
 		this.labelWorth.setText(labelWorth);
+	}
+
+	public ListView<OwnableField> getListView() {
+		return listviewBuilding;
 	}
 
 	public void setPlayer(Player player) {

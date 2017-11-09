@@ -1,5 +1,8 @@
 package me.dennisp.UI.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.*;
 import javafx.scene.control.*;
@@ -36,6 +39,7 @@ public class MainController implements Initializable {
 	@FXML private Button btnBuy;
 	@FXML private Button btnSell;
 	@FXML private Button btnEndTurn;
+	@FXML private Label labelPlayerName;
 
 	public MainController() {
 		this.domain = new Driver();
@@ -47,31 +51,41 @@ public class MainController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		initializePlayers();
 		initializeBoard();
+
+		domain.initialization();
+		labelPlayerName.setText(domain.getCurrentPlayer().getName());
 	}
 
 	@FXML
 	void ButtonThrow_Click(ActionEvent event) {
-
+		domain.movePlayer();
 	}
 
 	@FXML
 	void ButtonBuy_Click(ActionEvent event) {
-
+		domain.buyField();
 	}
 
 	@FXML
 	void ButtonSell_Click(ActionEvent event) {
+		ListView<OwnableField> fields = playerController.get(domain.getCurrentPlayer()).getListView();
 
+		if(fields.getSelectionModel().selectedIndexProperty().get() >= 0) {
+			System.out.println("Works?");
+		}
+
+		//domain.sellField(playerController.get());
 	}
 
 	@FXML
 	void ButtonEndTurn_Click(ActionEvent event) {
-
+		domain.endTurn();
+		labelPlayerName.setText(domain.getCurrentPlayer().getName());
 	}
 
 	private void initializeBoard() {
-		assignGridPositionToFields();
 		addColmnsAndRowsToGrid();
+		assignGridPositionToFields();
 		addShapeToFields();
 		drawBoard();
 	}
@@ -87,8 +101,8 @@ public class MainController implements Initializable {
 
 				Rectangle rectangle = new Rectangle();
 
-				rectangle.widthProperty().bind(pane.widthProperty());
-				rectangle.heightProperty().bind(pane.heightProperty());
+				rectangle.widthProperty().bind(gridBoard.getColumnConstraints().get((int) field.getGridPosition().getX()).percentWidthProperty());
+				rectangle.heightProperty().bind(gridBoard.getRowConstraints().get((int) field.getGridPosition().getY()).percentHeightProperty());
 
 				if(field instanceof OwnableField) {
 					rectangle.setFill(Color.GREEN);
@@ -116,59 +130,29 @@ public class MainController implements Initializable {
 	private void addShapeToFields() {
 		FieldTemplate[] fields = domain.getFields();
 
-		// formula:
-		// O = C * 2 + R * 2 + 4
+		ObservableList cols = gridBoard.getColumnConstraints();
+		ObservableList rows = gridBoard.getRowConstraints();
 
-		int columns = (int) Math.ceil(fields.length / 4.0);
-		int rows = (int) Math.floor(fields.length / 4.0 + 2);
-
-		final double width = (int) (gridBoard.getWidth() / columns);
-		final double height = (int) (gridBoard.getHeight() / rows);
+		Point2D point;
+		ColumnConstraints col;
+		RowConstraints row;
 
 		for(FieldTemplate field : fields) {
-			Point2D point = field.getGridPosition();
+			point = field.getGridPosition();
+			col = (ColumnConstraints) cols.get((int) point.getX());
+			row = (RowConstraints) rows.get((int) point.getY());
 
-			Rectangle shape = new Rectangle(point.getX() * width, point.getY() * height, width, height);
+			Rectangle shape = new Rectangle();
+
 			field.setShape(shape);
-		}
-	}
-
-	private void addColmnsAndRowsToGrid() {
-		FieldTemplate[] fields = domain.getFields();
-
-		// formula:
-		// O = C * 2 + R * 2 + 4
-
-		int columns = (int) Math.ceil(fields.length / 4.0);
-		int rows = (int) Math.floor(fields.length / 4.0 + 2);
-
-		final double widthPct = gridBoard.getPrefWidth() / (gridBoard.getPrefWidth() / columns);
-		final double heightPct = gridBoard.getPrefHeight() / (gridBoard.getPrefHeight() / rows);
-
-		// adds the columns and rows
-
-		for(int i = 0; i < columns; i++) {
-			ColumnConstraints col = new ColumnConstraints();
-			col.setPercentWidth(widthPct);
-			col.setHalignment(HPos.CENTER);
-
-			gridBoard.getColumnConstraints().add(col);
-		}
-
-		for(int i = 0; i < rows; i++) {
-			RowConstraints row = new RowConstraints();
-			row.setPercentHeight(heightPct);
-			row.setValignment(VPos.CENTER);
-
-			gridBoard.getRowConstraints().add(row);
 		}
 	}
 
 	private void assignGridPositionToFields() {
 		FieldTemplate[] fields = domain.getFields();
 
-		int columns = (int) Math.ceil(fields.length / 4.0);
-		int rows = (int) Math.floor(fields.length / 4.0 + 2);
+		int columns = gridBoard.getColumnConstraints().size();
+		int rows = gridBoard.getRowConstraints().size();
 
 		// assigning grid position to the fields
 
@@ -186,6 +170,34 @@ public class MainController implements Initializable {
 
 		for(int i = 0; i < columns; i++, idEC--) {
 			fields[idEC].setGridPosition(new Point2D(i, rows - 1));
+		}
+	}
+
+	private void addColmnsAndRowsToGrid() {
+		FieldTemplate[] fields = domain.getFields();
+
+		// formula:
+		// O = C * 2 + R * 2 + 4
+
+		int columns = (int) Math.ceil(fields.length / 4.0);
+		int rows = (int) Math.floor(fields.length / 4.0 + 2);
+
+		// adds the columns and rows
+
+		for(int i = 0; i < columns; i++) {
+			ColumnConstraints col = new ColumnConstraints();
+			col.percentWidthProperty().bind(gridBoard.widthProperty().divide(columns));
+			col.setHalignment(HPos.CENTER);
+
+			gridBoard.getColumnConstraints().add(col);
+		}
+
+		for(int i = 0; i < rows; i++) {
+			RowConstraints row = new RowConstraints();
+			row.percentHeightProperty().bind(gridBoard.heightProperty().divide(rows));
+			row.setValignment(VPos.CENTER);
+
+			gridBoard.getRowConstraints().add(row);
 		}
 	}
 

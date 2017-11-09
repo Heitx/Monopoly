@@ -33,7 +33,13 @@ public class Driver implements Domain {
 
 		fields = new FieldTemplate[MonopolyConstants.FIELD_NAMES.length];
 		fillFields();
+
 		//startGame();
+	}
+
+	@Override
+	public void initialization() {
+		currentPlayer = playerList.get(0);
 	}
 
 	public ConsoleView getView() {
@@ -43,6 +49,11 @@ public class Driver implements Domain {
 	@Override
 	public void addPlayer(String player) {
 		playerList.add(new Player(player, fields));
+	}
+
+	@Override
+	public Player getCurrentPlayer() {
+		return currentPlayer;
 	}
 
 	@Override
@@ -66,7 +77,7 @@ public class Driver implements Domain {
 	}
 
 	@Override
-	public boolean sellField() {
+	public boolean sellField(int index) {
 		return false;
 	}
 
@@ -76,7 +87,6 @@ public class Driver implements Domain {
 	}
 
 	private void startGame() {
-		initalizeGame();
 		view.println(startMessage());
 		view.getParser().reset();
 		runGameLoop();
@@ -116,27 +126,6 @@ public class Driver implements Domain {
 					fields[i] = new OwnableField(MonopolyConstants.FIELD_NAMES[i], i + 1, i * 10, new PayConsequence());
 			}
 		}
-	}
-
-	private void initalizeGame() {
-		view.println("How many players?");
-
-		int playersIngame;
-
-		do {
-			playersIngame = view.getParser().getPlayerAmount();
-
-			if(playersIngame < 2) {
-				view.println("Error: at least two players!");
-			}
-		} while(playersIngame < 2);
-
-		for(int i = 0; i < playersIngame; i++) {
-			view.println("Enter name of player #" + (i + 1) + ":");
-			playerList.add(new Player(view.getParser().getPlayerName(), fields));
-		}
-
-		currentPlayer = playerList.get(0);
 	}
 
 	// TODO: Seperate functions to the text and winning condition...
